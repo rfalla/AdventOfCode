@@ -1,3 +1,9 @@
+# Day 2
+# Given present dimensions in presents.txt in format 1x2x3
+# Part 1: work out how much wrapping paper is needed
+# - for each present need surface area of box + smallest side area
+# Paer 2: work out how much ribbon is needed
+# - for each present need volume of box + 2*(smallest side + 2nd smallest side)
 presents = open('presents.txt')
 total_paper = 0
 total_ribbon = 0
