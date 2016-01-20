@@ -5,139 +5,151 @@
 # mana = gold
 # spells can last for more than one turn (effect)
 
-def takeTurn(spell):
-    boss['hp'] = 71
-    boss['damage'] = 10
-    me['hp'] = 50
-    me['mana'] = 500
-    me['armor'] = 0
-    effects['missile'] = 0
-    effects['drain'] = 0
-    effects['shield'] = 0
-    effects['poison'] = 0
-    effects['recharge'] = 0
-    cost = 0
-    while boss['hp'] > 0 and me['hp'] > 0 and cost < minCost:
-        if (debug):
-            print '-- Player Turn --'
-            print '- Player has {0} hp, {1} armor, {2} mana'.format(me['hp'],me['armor'],me['mana'])
-            print '- Boss has {} hp'.format(boss['hp'])
-        checkEffects()
-        if boss['hp'] <= 0 or me['hp'] <= 0 or me['mana'] < 53:
-            break
-        canUse = False
-        spell = 'missile'
-        while canUse == False:
-            spell = random.choice(spells_list)
-            if me['mana'] >= spells[spell,'mana'] and effects[spell] < 1:
-                canUse = True
-        cost += spells[spell,'mana']
-        meTurn(spell)
-        if boss['hp'] <= 0 or me['hp'] <= 0 or me['mana'] < 53:
-            break
-        if (debug):
-            print '-- Boss Turn --'
-            print '- Player has {0} hp, {1} armor, {2} mana'.format(me['hp'],me['armor'],me['mana'])
-            print '- Boss has {} hp'.format(boss['hp'])
-        checkEffects()
-        if boss['hp'] <= 0 or me['hp'] <= 0:
-            break
-        bossTurn()
-        if boss['hp'] <= 0 or me['hp'] <= 0 or me['mana'] < 53:
-            break
+def takeTurn(spell, boss_hp, boss_damage, me_hp, me_mana, _cost, _shield, _poison, _recharge):
+    #print spell, _cost, _shield, _poison, _recharge
+    global minCost
     if (debug):
-        if me['mana'] < 53:
-            print '-- not enough mana --'
-        elif cost >= minCost:
-            print '-- costs too much --'
-        elif boss['hp'] <= 0 and me['hp'] > 0:
-            print '-- Player Wins --'
-            print '... at a price of {} mana\n\n'.format(cost)
-            if cost < minCost:
-                minCost = cost
-                notWon = False
-        else:
-            print '-- Boss Wins --\n\n'
-    else:
-        if me['hp'] > 0 and boss['hp'] <= 0 and cost < minCost:
-            minCost = cost
-            notWon = False
-    i += 1
-
-
-def checkEffects():
+        print '-- Player Turn --'
+        print '- Player has {0} hp, {1} mana'.format(me_hp,me_mana)
+        print '- Boss has {} hp'.format(boss_hp)
+        print '- cost so far is {}'.format(_cost)
+    armor = 0
     # Part 2 #
-    #me['hp'] -= 1
+    if (part2):    
+        me_hp -= 1
     #--------#
-    if effects['missile'] > 0:
+    if _shield > 0:
         if (debug):
-            print 'Missile deals 4 damage, {} turns left on timer'.format(effects['missile']-1)
-        boss['hp'] -= 4
-        effects['missile'] -= 1
-    if effects['drain'] > 0:
-        if (debug): 
-            print 'Drain deals 2 damage and gives 2hp, {} turns left on timer'.format(effects['drain']-1)
-        boss['hp'] -= 2
-        me['hp'] += 2
-        effects['drain'] -= 1
-    if effects['shield'] > 0:
+            print 'Shield is on, player armor = 7, {} turns left on timer'.format(_shield-1)
+        armor = 7
+        _shield -= 1
+    if _poison > 0:
         if (debug):
-            print 'Shield is on, {} turns left on timer'.format(effects['shield']-1)
-        me['armor'] = 7
-        effects['shield'] -= 1
-        if effects['shield'] == 0:
-            me['armor'] = 0
-    if effects['poison'] > 0:
+            print 'Poison deals 3 damage, {} turns left on timer'.format(_poison-1)
+        boss_hp -= 3
+        _poison -= 1
+    if _recharge > 0:
         if (debug):
-            print 'Poison deals 3 damage, {} turns left on timer'.format(effects['poison']-1)
-        boss['hp'] -= 3
-        effects['poison'] -= 1
-    if effects['recharge'] > 0:
-        if (debug):
-            print 'Recharge gives 101 mana, {} turns left on timer'.format(effects['recharge']-1)
-        me['mana'] += 101
-        effects['recharge'] -= 1
-        
-def bossTurn():
-    damage = max(1,boss['damage']-me['armor'])
-    if (debug):
-        print 'Boss attacks {} damage'.format(damage)
-    me['hp'] -= damage
-    return 1
+            print 'Recharge gives 101 mana, {} turns left on timer'.format(_recharge-1)
+        me_mana += 101
+        _recharge -= 1
 
-def meTurn(spell):
+    if boss_hp <= 0 and me_hp > 0:
+        if (debug):
+            print 'Player Wins! At a cost of {}'.format(_cost)
+        if _cost < minCost:
+            if (debug):
+                print 'This is a new minimum cost'
+            minCost = _cost
+            return True
+
     if (debug):
-        print 'Player casts {0}, cost = {1}, total cost = {2}'.format(spell,spells[spell,'mana'],cost)
-    me['mana'] -= spells[spell,'mana']
-    effects[spell] = spells[spell,'effect']
-    return 1
+        print 'Player uses {}'.format(spell)
+    if spell == 'missile':
+        boss_hp -= 4
+    elif spell == 'drain':
+        boss_hp -= 2
+        me_hp += 2
+    elif spell == 'shield':
+        if _shield == 0:
+            _shield = 6
+        else:
+            if (debug):
+                print 'shield already in play'
+            return False
+    elif spell == 'poison':
+        if _poison == 0:
+            _poison = 6
+        else:
+            if (debug):
+                print 'poison already in play'
+            return False
+    elif spell == 'recharge':
+        if _recharge == 0:
+            _recharge = 5
+        else:
+            if (debug):
+                'recharge already in play'
+            return False
+
+    me_mana -= spellcost[spell]
+    _cost += spellcost[spell]
+
+    if _cost > minCost:
+        if (debug):
+            print 'current cost > {}'.format(minCost)
+        return False
+
+    if boss_hp <= 0 and me_hp > 0:
+        if (debug):
+            print 'Player Wins! At a cost of {}'.format(_cost)
+        if _cost < minCost:
+            if (debug):
+                print 'This is a new minimum cost'
+            minCost = _cost
+            return True
+
+    if (debug):
+        print '-- Boss Turn --'
+        print '- Player has {0} hp, {1} mana'.format(me_hp,me_mana)
+        print '- Boss has {} hp'.format(boss_hp)
+
+    armor = 0
+    if _shield > 0:
+        if (debug):
+            print 'Shield is on, player armor = 7, {} turns left on timer'.format(_shield-1)
+        armor = 7
+        _shield -= 1
+    if _poison > 0:
+        if (debug):
+            print 'Poison deals 3 damage, {} turns left on timer'.format(_poison-1)
+        boss_hp -= 3
+        _poison -= 1
+    if _recharge > 0:
+        if (debug):
+            print 'Recharge gives 101 mana, {} turns left on timer'.format(_recharge-1)
+        me_mana += 101
+        _recharge -= 1
+
+    if boss_hp <= 0 and me_hp > 0:
+        if (debug):
+            print 'Player Wins! At a cost of {}'.format(_cost)
+        if _cost < minCost:
+            if (debug):
+                print 'This is a new minimum cost'
+            minCost = _cost
+            return True
+
+    me_hp -= max((boss_damage - armor),1)
+    if me_hp <= 0:
+        if (debug):
+            print 'Boss Wins!'
+        return False
+
+    for nextspell in spells_list:
+        if me_mana > spellcost[nextspell]:
+            takeTurn(nextspell, boss_hp, boss_damage, me_hp, me_mana, _cost, _shield, _poison, _recharge)
+    if (debug):
+        print 'Boss Wins!'
+    return False
 
 if __name__ == "__main__":
     # setup
     global debug
-    debug = False
-    global spells
-    spells = {}
-    spells['missile','mana'] = 53
-    spells['missile','effect'] = 1
-    spells['drain','mana'] = 73
-    spells['drain','effect'] = 1
-    spells['shield','mana'] = 113
-    spells['shield','effect'] = 6
-    spells['poison','mana'] = 173
-    spells['poison','effect'] = 6
-    spells['recharge','mana'] = 229
-    spells['recharge','effect'] = 5
+    debug = True
+    global part2
+    part2 = True
+    global spells_list
     spells_list = ['missile','drain','shield','poison','recharge']
-    # actual play
-    global cost
-    global boss
-    boss = {}
-    global me
-    me = {}
-    global effects
-    effects = {}
-    minCost = 1000000000
+    global spellcost
+    spellcost = {}
+    spellcost['missile'] = 53
+    spellcost['drain'] = 73
+    spellcost['shield'] = 113
+    spellcost['poison'] = 173
+    spellcost['recharge'] = 229
+    global minCost
+    minCost = 3000 # I know from previous code that both answers are < 3000
     for spell in spells_list:
-        takeTurn(spell)
+        takeTurn(spell, 71, 10, 50, 500, 0, 0, 0, 0)
     print 'minimum cost was {}'.format(minCost)
