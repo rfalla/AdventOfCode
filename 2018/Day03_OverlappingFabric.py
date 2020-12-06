@@ -4,6 +4,11 @@
 # w and h are the width and height of the rectangle
 #
 # Count how many square inches of fabric have overlapping claims
+#
+# Part 2: only one order doesn't overlap, what is this order?
+
+# IMPROVEMENTS: use orders = [[*map(int, re.findall(r'\d+', x))] for x in open('input_03.txt')] instead of manaually using int() for each variable
+# then don't need to use global variables because can perform remainder on orders (list of orders)
 import re
 
 coords = {}
@@ -13,10 +18,10 @@ def process_order(input):
     #print(order.group(0), order.group(1), order.group(2), order.group(3), order.group(4), order.group(5))
     id, left, top, width, height = int(order.group(1)), int(order.group(2)), int(order.group(3)), int(order.group(4)), int(order.group(5))
     unique_id = True
-    for i in range(width):
-        for j in range(height):
+    for i in range(left, left+width):
+        for j in range(top, top+height):
             #print('x = {}, y = {}'.format(left+i, top+j))
-            coord = str(left+i) + ',' + str(top+j)
+            coord = str(i) + ',' + str(j)
             if coord in coords:
                 unique_ids.pop(coords[coord], None)
                 coords[coord] = -1
