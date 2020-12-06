@@ -1,0 +1,9 @@
+with open('input.txt','r') as f:
+#   input = f.read()
+#   f.close()
+#input = [map(int, x) for x in input]
+#print(input)
+   with open('input.txt','r') as f:
+   input = f.read()
+   f.close()
+input = input[0:-1]

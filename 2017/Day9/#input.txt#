@@ -1,0 +1,8 @@
+{}, 1 group.
+{{{}}}, 3 groups.
+{{},{}}, also 3 groups.
+{{{},{},{{}}}}, 6 groups.
+{}, 1 group (which itself contains garbage).
+{}, 1 group.
+{{}}, 5 groups.
+{{}}, 2 groups
