@@ -51,21 +51,17 @@ def check_rule(rule, n):
     return (rule[0] <= n <= rule[1]) or (rule[2] <= n <= rule[3])
 
 def find_category_order(rules, valid_tickets):
-    # Transposing the data
     columns = {}
     potential_rules = {}
-    potential_columns = {}
     for i in range(len(rules)):
         columns[i] = [x[i] for x in valid_tickets]
         potential_rules[i] = list(rules.keys())
-        potential_columns[list(rules.keys())[i]] = list(range(len(rules)))
     settled_rules = {}
     for column in columns:
         for c in columns[column]:
             for rule in potential_rules[column]:
                 if check_rule(rules[rule],c) == False:
                     potential_rules[column].remove(rule)
-                    potential_columns[rule].remove(column)
                     break
     cols_to_remove = []
     
@@ -74,12 +70,8 @@ def find_category_order(rules, valid_tickets):
             potential_rules[col] = [x for x in potential_rules[col] if x not in cols_to_remove]
             if len(potential_rules[col]) == 1:
                 settled_rules[potential_rules[col][0]] = col
-                if col not in cols_to_remove: cols_to_remove.append(col)
-        for rule in potential_columns:
-            if len(potential_columns[rule]) == 1:
-                settled_rules[rule] = potential_columns[rule][0]
-                potential_rules.pop(potential_columns[rule][0], None)
-                if potential_columns[rule][0] not in cols_to_remove: cols_to_remove.append(potential_columns[rule][0])
+                if col not in cols_to_remove: 
+                    cols_to_remove.append(col)
         for rule in settled_rules:
             [potential_rules[x].remove(rule) for x in potential_rules if rule in potential_rules[x]]
 
