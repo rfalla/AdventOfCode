@@ -18,6 +18,9 @@
 #    Action R means to rotate the waypoint around the ship right (clockwise) the given number of degrees.
 #    Action F means to move forward to the waypoint a number of times equal to the given value.
 # What is the Manhatten distance this time?
+#
+# NEXT TIME USE COMPLEX NUMBERS
+# complex*i to rotate left/ccw, complex*-i to rotate right/cw
 from math import cos, sin, radians
 import numpy as np
 directions_part1 = {'N': lambda n, r: (0, n, 0)
