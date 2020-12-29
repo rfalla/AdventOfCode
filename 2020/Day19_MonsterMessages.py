@@ -25,7 +25,7 @@ def check_rules(rules, message, target):
             #print('a or b in rule and don\'t match, {}, {}'.format(rule, message))
             return False
     else:
-        #print('Going into ANY function with remainder of target')
+        #print('Going into ANY function with remainder of target, {}, {}'.format(rule, target[1:]))
         return any(check_rules(rules, message, r + target[1:]) for r in rule)
                                
 
