@@ -15,7 +15,6 @@
 # Part 2: How many # are not part of a sea monster?
 #
 # NOTES: This code is not optimised AT ALL, it is so slow and ugly but I am bored of this puzzle so moving onto day 21!
-from functools import reduce
 import numpy as np
 from collections import defaultdict
 def parse(filename):
@@ -27,6 +26,7 @@ def parse(filename):
     return tiles
 
 def find_tile_alternates(tile):
+    #should definitely implement a cache of these values instead of keeping calculating them!
     tiles = []
     tiles.append(tile)
     tiles.append(np.rot90(tile,1))
